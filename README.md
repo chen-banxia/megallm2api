@@ -111,7 +111,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-3.5-turbo",
+    "model": "openai-gpt-oss-120b",
     "messages": [
       {"role": "user", "content": "你好！"}
     ],

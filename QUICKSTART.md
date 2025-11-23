@@ -70,7 +70,7 @@ import requests
 response = requests.post(
     "http://localhost:8000/v1/chat/completions",
     json={
-        "model": "gpt-3.5-turbo",
+        "model": "openai-gpt-oss-120b",
         "messages": [
             {"role": "user", "content": "你好"}
         ]
@@ -104,7 +104,7 @@ print(response.choices[0].message.content)
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-3.5-turbo",
+    "model": "openai-gpt-oss-120b",
     "messages": [{"role": "user", "content": "你好"}]
   }'
 ```
@@ -115,7 +115,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 - gpt-4
 - gpt-4-turbo
-- gpt-3.5-turbo
+- openai-gpt-oss-120b
 - claude-3-opus
 - claude-3-sonnet
 - 以及 MegaLLM 支持的其他模型

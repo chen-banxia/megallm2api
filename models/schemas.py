@@ -14,7 +14,7 @@ class Message(BaseModel):
 
 class ChatCompletionRequest(BaseModel):
     """聊天补全请求"""
-    model: str = Field(..., description="模型ID", examples=["gpt-4", "gpt-3.5-turbo"])
+    model: str = Field(..., description="模型ID", examples=["gpt-4", "openai-gpt-oss-120b"])
     messages: List[Message] = Field(..., description="消息列表", min_length=1)
 
     # 可选参数
@@ -32,7 +32,7 @@ class ChatCompletionRequest(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "model": "gpt-3.5-turbo",
+                "model": "openai-gpt-oss-120b",
                 "messages": [
                     {"role": "user", "content": "你好！"}
                 ],

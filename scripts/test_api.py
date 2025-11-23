@@ -31,7 +31,7 @@ def test_chat_completion():
     print("测试聊天补全...")
 
     payload = {
-        "model": "gpt-3.5-turbo",
+        "model": "openai-gpt-oss-120b",
         "messages": [
             {"role": "user", "content": "你好，请用一句话介绍自己"}
         ],

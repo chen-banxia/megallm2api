@@ -123,11 +123,18 @@ class ProxyService:
         return {
             "object": "list",
             "data": [
-                {"id": "gpt-4", "object": "model"},
-                {"id": "gpt-4-turbo", "object": "model"},
-                {"id": "gpt-3.5-turbo", "object": "model"},
-                {"id": "claude-3-opus", "object": "model"},
-                {"id": "claude-3-sonnet", "object": "model"},
+                {"id": "openai-gpt-oss-20b", "object": "model"},
+                {"id": "llama3.3-70b-instruct", "object": "model"},
+                {"id": "deepseek-r1-distill-llama-70b", "object": "model"},
+                {"id": "alibaba-qwen3-32b", "object": "model"},
+                {"id": "openai-gpt-oss-120b", "object": "model"},
+                {"id": "llama3-8b-instruct", "object": "model"},
+                {"id": "moonshotai/kimi-k2-instruct-0905", "object": "model"},
+                {"id": "deepseek-ai/deepseek-v3.1-terminus", "object": "model"},
+                {"id": "qwen/qwen3-next-80b-a3b-instruct", "object": "model"},
+                {"id": "deepseek-ai/deepseek-v3.1", "object": "model"},
+                {"id": "mistralai/mistral-nemotron", "object": "model"},
+                {"id": "minimaxai/minimax-m2", "object": "model"},
             ]
         }
 

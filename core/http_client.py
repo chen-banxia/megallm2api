@@ -146,7 +146,7 @@ class MegaLLMClient:
         try:
             await self.chat_completion(
                 api_key=api_key,
-                model="gpt-3.5-turbo",
+                model="openai-gpt-oss-120b",
                 messages=[{"role": "user", "content": "test"}],
                 max_tokens=1
             )
