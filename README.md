@@ -111,20 +111,35 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "openai-gpt-oss-120b",
     "messages": [
       {"role": "user", "content": "你好！"}
-    ],
-    "temperature": 0.7,
-    "max_tokens": 1000
+    ]
   }'
 ```
+
+**注意**:
+- `model` 参数是可选的,不传则默认使用 `openai-gpt-oss-120b`
+- 其他参数(如 `temperature`、`max_tokens` 等)由后端自动设置默认值
 
 ### Python 示例
 
 ```python
 import requests
 
+# 最简示例 - 使用默认模型
+response = requests.post(
+    "http://localhost:8000/v1/chat/completions",
+    json={
+        "messages": [
+            {"role": "user", "content": "介绍一下Python"}
+        ]
+    }
+)
+
+result = response.json()
+print(result['choices'][0]['message']['content'])
+
+# 指定模型
 response = requests.post(
     "http://localhost:8000/v1/chat/completions",
     json={
@@ -132,14 +147,9 @@ response = requests.post(
         "messages": [
             {"role": "system", "content": "你是一个有用的助手"},
             {"role": "user", "content": "介绍一下Python"}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 2000
+        ]
     }
 )
-
-result = response.json()
-print(result['choices'][0]['message']['content'])
 ```
 
 ### 使用 OpenAI SDK
@@ -153,14 +163,22 @@ client = OpenAI(
     api_key="dummy"  # 代理服务会自动管理真实密钥
 )
 
+# 不指定 model,使用默认模型 openai-gpt-oss-120b
 response = client.chat.completions.create(
-    model="gpt-4",
     messages=[
         {"role": "user", "content": "Hello!"}
     ]
 )
 
 print(response.choices[0].message.content)
+
+# 或指定具体模型
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "user", "content": "Hello!"}
+    ]
+)
 ```
 
 ## 管理端点

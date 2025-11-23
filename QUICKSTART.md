@@ -67,10 +67,10 @@ python scripts/test_api.py
 ```python
 import requests
 
+# 最简示例 - 使用默认模型 openai-gpt-oss-120b
 response = requests.post(
     "http://localhost:8000/v1/chat/completions",
     json={
-        "model": "openai-gpt-oss-120b",
         "messages": [
             {"role": "user", "content": "你好"}
         ]
@@ -78,6 +78,17 @@ response = requests.post(
 )
 
 print(response.json()['choices'][0]['message']['content'])
+
+# 或指定具体模型
+response = requests.post(
+    "http://localhost:8000/v1/chat/completions",
+    json={
+        "model": "gpt-4",
+        "messages": [
+            {"role": "user", "content": "你好"}
+        ]
+    }
+)
 ```
 
 ### 使用 OpenAI SDK
@@ -90,8 +101,8 @@ client = OpenAI(
     api_key="dummy"  # 任意值，服务会自动使用配置的密钥
 )
 
+# 不指定 model,使用默认模型 openai-gpt-oss-120b
 response = client.chat.completions.create(
-    model="gpt-4",
     messages=[{"role": "user", "content": "Hello!"}]
 )
 
@@ -104,10 +115,11 @@ print(response.choices[0].message.content)
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "openai-gpt-oss-120b",
     "messages": [{"role": "user", "content": "你好"}]
   }'
 ```
+
+**提示**: `model` 参数可选,不传则使用默认模型 `openai-gpt-oss-120b`
 
 ## 支持的模型
 

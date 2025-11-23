@@ -13,31 +13,16 @@ class Message(BaseModel):
 
 
 class ChatCompletionRequest(BaseModel):
-    """聊天补全请求"""
-    model: str = Field(..., description="模型ID", examples=["gpt-4", "openai-gpt-oss-120b"])
+    """聊天补全请求 - 简化版"""
+    model: Optional[str] = Field(None, description="模型ID，不传则使用默认模型", examples=["gpt-4", "openai-gpt-oss-120b"])
     messages: List[Message] = Field(..., description="消息列表", min_length=1)
-
-    # 可选参数
-    temperature: Optional[float] = Field(1.0, ge=0, le=2, description="采样温度")
-    top_p: Optional[float] = Field(1.0, ge=0, le=1, description="核采样")
-    n: Optional[int] = Field(1, ge=1, le=10, description="返回结果数量")
-    stream: Optional[bool] = Field(False, description="是否流式返回")
-    stop: Optional[List[str]] = Field(None, description="停止词")
-    max_tokens: Optional[int] = Field(None, ge=1, description="最大token数")
-    presence_penalty: Optional[float] = Field(0, ge=-2, le=2, description="存在惩罚")
-    frequency_penalty: Optional[float] = Field(0, ge=-2, le=2, description="频率惩罚")
-    logit_bias: Optional[Dict[str, float]] = Field(None, description="logit偏置")
-    user: Optional[str] = Field(None, description="用户标识")
 
     class Config:
         json_schema_extra = {
             "example": {
-                "model": "openai-gpt-oss-120b",
                 "messages": [
                     {"role": "user", "content": "你好！"}
-                ],
-                "temperature": 0.7,
-                "max_tokens": 1000
+                ]
             }
         }
 

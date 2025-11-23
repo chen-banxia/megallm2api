@@ -53,34 +53,24 @@ async def chat_completions(
         # 转换消息格式
         messages = [msg.dict() for msg in request_data.messages]
 
-        # 准备额外参数
-        extra_params = {}
-        if request_data.temperature is not None:
-            extra_params["temperature"] = request_data.temperature
-        if request_data.top_p is not None:
-            extra_params["top_p"] = request_data.top_p
-        if request_data.max_tokens is not None:
-            extra_params["max_tokens"] = request_data.max_tokens
-        if request_data.n is not None:
-            extra_params["n"] = request_data.n
-        if request_data.stream is not None:
-            extra_params["stream"] = request_data.stream
-        if request_data.stop is not None:
-            extra_params["stop"] = request_data.stop
-        if request_data.presence_penalty is not None:
-            extra_params["presence_penalty"] = request_data.presence_penalty
-        if request_data.frequency_penalty is not None:
-            extra_params["frequency_penalty"] = request_data.frequency_penalty
-        if request_data.logit_bias is not None:
-            extra_params["logit_bias"] = request_data.logit_bias
-        if request_data.user is not None:
-            extra_params["user"] = request_data.user
+        # 使用默认模型（如果未指定）
+        model = request_data.model or "openai-gpt-oss-120b"
 
-        logger.info(f"收到聊天补全请求: model={request_data.model}, messages={len(messages)}")
+        # 后端自动补充默认参数
+        extra_params = {
+            "temperature": 1.0,
+            "top_p": 1.0,
+            "n": 1,
+            "stream": False,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0
+        }
+
+        logger.info(f"收到聊天补全请求: model={model}, messages={len(messages)}")
 
         # 调用代理服务
         result = await proxy_service.chat_completion(
-            model=request_data.model,
+            model=model,
             messages=messages,
             **extra_params
         )
