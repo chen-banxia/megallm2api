@@ -1,0 +1,9 @@
+fastapi==0.109.0
+httpx==0.26.0
+loguru==0.7.2
+pydantic==2.5.3
+pydantic-settings==2.1.0
+pydantic_core==2.14.6
+python-multipart==0.0.6
+tenacity==8.2.3
+uvicorn==0.27.0
