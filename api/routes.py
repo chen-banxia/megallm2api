@@ -12,6 +12,11 @@ from models.schemas import (
     ErrorResponse,
     HealthResponse
 )
+from config.model_config import (
+    check_context_limit,
+    get_context_exceeded_error,
+    get_all_models_info
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +60,22 @@ async def chat_completions(
 
         # 使用默认模型（如果未指定）
         model = request_data.model or "openai-gpt-oss-120b"
+
+        # 检查上下文长度限制
+        is_exceeded, current_tokens, context_limit = check_context_limit(model, messages)
+
+        if is_exceeded:
+            logger.warning(
+                f"上下文超限: model={model}, current_tokens={current_tokens}, "
+                f"limit={context_limit}, usage={current_tokens/context_limit*100:.2f}%"
+            )
+            error_response = get_context_exceeded_error(model, current_tokens, context_limit)
+            raise HTTPException(status_code=400, detail=error_response)
+
+        logger.info(
+            f"上下文检查通过: model={model}, messages={len(messages)}, "
+            f"tokens={current_tokens}/{context_limit} ({current_tokens/context_limit*100:.1f}%)"
+        )
 
         # 准备额外参数 - 如果前端传递了就使用前端的值,否则使用默认值
         extra_params = {
@@ -130,11 +151,11 @@ async def chat_completions(
 @router.get(
     "/v1/models",
     summary="获取可用模型列表",
-    description="返回所有可用的AI模型"
+    description="返回所有可用的AI模型及其上下文长度"
 )
 async def list_models(request: Request) -> Dict[str, Any]:
     """
-    获取模型列表
+    获取模型列表（包含上下文长度信息）
 
     Args:
         request: FastAPI请求对象
@@ -145,9 +166,61 @@ async def list_models(request: Request) -> Dict[str, Any]:
     try:
         proxy_service = request.app.state.proxy_service
         models = await proxy_service.get_models()
+
+        # 添加上下文长度信息
+        models_info = get_all_models_info()
+        context_map = {m["id"]: m for m in models_info}
+
+        # 为每个模型添加上下文信息
+        for model in models.get("data", []):
+            model_id = model.get("id")
+            if model_id in context_map:
+                model["context_length"] = context_map[model_id]["context_length"]
+                model["context_length_formatted"] = context_map[model_id]["context_length_formatted"]
+
         return models
     except Exception as e:
         logger.error(f"获取模型列表失败: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get(
+    "/v1/models/{model_id}/info",
+    summary="获取指定模型信息",
+    description="返回指定模型的详细信息，包括上下文长度"
+)
+async def get_model_info(model_id: str) -> Dict[str, Any]:
+    """
+    获取指定模型的详细信息
+
+    Args:
+        model_id: 模型ID
+
+    Returns:
+        模型信息
+    """
+    try:
+        from config.model_config import get_model_context_limit, MODEL_CONTEXT_LIMITS
+
+        if model_id not in MODEL_CONTEXT_LIMITS:
+            # 返回默认信息
+            return {
+                "id": model_id,
+                "context_length": get_model_context_limit(model_id),
+                "context_length_formatted": f"{get_model_context_limit(model_id):,} tokens",
+                "note": "使用默认上下文长度"
+            }
+
+        context_limit = get_model_context_limit(model_id)
+        return {
+            "id": model_id,
+            "context_length": context_limit,
+            "context_length_formatted": f"{context_limit:,} tokens",
+            "usable_limit": int(context_limit * 0.9),
+            "usable_limit_formatted": f"{int(context_limit * 0.9):,} tokens (90%)"
+        }
+    except Exception as e:
+        logger.error(f"获取模型信息失败: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

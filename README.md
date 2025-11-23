@@ -113,6 +113,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 
 ### 聊天补全
 
+#### 单次对话
+
 ```bash
 curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
@@ -123,9 +125,26 @@ curl -X POST http://localhost:8000/v1/chat/completions \
   }'
 ```
 
+#### 多轮对话
+
+```bash
+curl -X POST http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "openai-gpt-oss-120b",
+    "messages": [
+      {"role": "system", "content": "你是一个有用的助手"},
+      {"role": "user", "content": "介绍一下Python"},
+      {"role": "assistant", "content": "Python是一种高级编程语言..."},
+      {"role": "user", "content": "它有哪些优点？"}
+    ]
+  }'
+```
+
 **注意**:
 - `model` 参数是可选的,不传则默认使用 `openai-gpt-oss-120b`
 - 其他参数(如 `temperature`、`max_tokens` 等)由后端自动设置默认值
+- **上下文限制**: 每个模型都有上下文长度限制，超出后会返回 400 错误，提示开始新对话
 
 ### Python 示例
 
@@ -225,7 +244,49 @@ curl -X POST http://localhost:8000/admin/reset-failed-keys
 ### 获取模型列表
 
 ```bash
+# 获取所有模型（包含上下文长度信息）
 curl http://localhost:8000/v1/models
+```
+
+返回示例：
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "openai-gpt-oss-120b",
+      "object": "model",
+      "context_length": 128000,
+      "context_length_formatted": "128,000 tokens"
+    },
+    {
+      "id": "qwen/qwen3-next-80b-a3b-instruct",
+      "object": "model",
+      "context_length": 262000,
+      "context_length_formatted": "262,000 tokens"
+    }
+  ]
+}
+```
+
+### 获取指定模型信息
+
+```bash
+# 获取指定模型的详细信息
+curl http://localhost:8000/v1/models/openai-gpt-oss-120b/info
+```
+
+返回示例：
+
+```json
+{
+  "id": "openai-gpt-oss-120b",
+  "context_length": 128000,
+  "context_length_formatted": "128,000 tokens",
+  "usable_limit": 115200,
+  "usable_limit_formatted": "115,200 tokens (90%)"
+}
 ```
 
 ## 高可用特性详解
@@ -250,12 +311,37 @@ curl http://localhost:8000/v1/models
    标记失败      标记失败
 ```
 
-### 4. 监控和日志
+### 4. 上下文长度管理
+
+- **智能检测**: 自动检测消息是否超出模型上下文限制
+- **友好提示**: 超限时返回详细错误信息，包括当前使用量和限制
+- **多模型支持**: 为每个模型配置准确的上下文长度
+- **Token 估算**: 自动估算消息的 token 数量
+
+**支持的模型上下文长度**:
+
+| 模型 | 上下文长度 |
+|------|-----------|
+| qwen/qwen3-next-80b-a3b-instruct | 262,000 tokens |
+| moonshotai/kimi-k2-instruct-0905 | 256,000 tokens |
+| deepseek-ai/deepseek-v3.1-terminus | 164,000 tokens |
+| llama3.3-70b-instruct | 131,000 tokens |
+| alibaba-qwen3-32b | 131,000 tokens |
+| openai-gpt-oss-120b | 128,000 tokens |
+| openai-gpt-oss-20b | 128,000 tokens |
+| deepseek-r1-distill-llama-70b | 128,000 tokens |
+| deepseek-ai/deepseek-v3.1 | 128,000 tokens |
+| mistralai/mistral-nemotron | 128,000 tokens |
+| minimaxai/minimax-m2 | 128,000 tokens |
+| llama3-8b-instruct | 8,000 tokens |
+
+### 5. 监控和日志
 
 - 每个请求的详细日志
 - 密钥使用统计
 - 失败原因追踪
 - 性能指标记录
+- 上下文使用率监控
 
 ## 测试
 
@@ -277,6 +363,9 @@ python scripts/test_api.py
 
 # 测试流式响应
 python scripts/test_stream.py
+
+# 测试上下文限制功能
+python scripts/test_context_limit.py
 ```
 
 ## 部署建议
