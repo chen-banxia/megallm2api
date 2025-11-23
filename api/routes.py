@@ -3,7 +3,7 @@ API路由定义
 """
 import logging
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from typing import Dict, Any
 
 from models.schemas import (
@@ -32,7 +32,7 @@ router = APIRouter()
 async def chat_completions(
     request_data: ChatCompletionRequest,
     request: Request
-) -> Dict[str, Any]:
+):
     """
     聊天补全API端点
 
@@ -41,7 +41,7 @@ async def chat_completions(
         request: FastAPI请求对象
 
     Returns:
-        聊天补全响应
+        聊天补全响应（非流式）或 StreamingResponse（流式）
 
     Raises:
         HTTPException: 请求失败时
@@ -56,17 +56,23 @@ async def chat_completions(
         # 使用默认模型（如果未指定）
         model = request_data.model or "openai-gpt-oss-120b"
 
-        # 后端自动补充默认参数
+        # 准备额外参数 - 如果前端传递了就使用前端的值,否则使用默认值
         extra_params = {
-            "temperature": 1.0,
-            "top_p": 1.0,
-            "n": 1,
-            "stream": False,
-            "presence_penalty": 0.0,
-            "frequency_penalty": 0.0
+            "temperature": request_data.temperature if request_data.temperature is not None else 1.0,
+            "top_p": request_data.top_p if request_data.top_p is not None else 1.0,
+            "n": request_data.n if request_data.n is not None else 1,
+            "stream": request_data.stream if request_data.stream is not None else False,
+            "presence_penalty": request_data.presence_penalty if request_data.presence_penalty is not None else 0.0,
+            "frequency_penalty": request_data.frequency_penalty if request_data.frequency_penalty is not None else 0.0
         }
 
-        logger.info(f"收到聊天补全请求: model={model}, messages={len(messages)}")
+        # 如果前端传递了 max_tokens,则添加到参数中
+        if request_data.max_tokens is not None:
+            extra_params["max_tokens"] = request_data.max_tokens
+
+        is_stream = extra_params["stream"]
+
+        logger.info(f"收到聊天补全请求: model={model}, messages={len(messages)}, params={extra_params}")
 
         # 调用代理服务
         result = await proxy_service.chat_completion(
@@ -75,6 +81,22 @@ async def chat_completions(
             **extra_params
         )
 
+        # 如果是流式响应，返回 StreamingResponse
+        if is_stream:
+            async def generate():
+                async for chunk in result.aiter_bytes():
+                    yield chunk
+
+            return StreamingResponse(
+                generate(),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                }
+            )
+
+        # 非流式响应直接返回
         return result
 
     except HTTPException:

@@ -70,7 +70,7 @@ class MegaLLMClient:
         model: str,
         messages: list,
         **kwargs
-    ) -> Dict[str, Any]:
+    ):
         """
         调用聊天补全API
 
@@ -81,7 +81,7 @@ class MegaLLMClient:
             **kwargs: 其他参数（temperature, max_tokens等）
 
         Returns:
-            API响应字典
+            API响应字典（非流式）或 httpx.Response（流式）
 
         Raises:
             httpx.HTTPStatusError: HTTP错误
@@ -103,12 +103,21 @@ class MegaLLMClient:
             **kwargs
         }
 
-        logger.info(f"发送请求到MegaLLM API: model={model}, messages_count={len(messages)}")
+        # 判断是否为流式请求
+        is_stream = kwargs.get("stream", False)
+
+        logger.info(f"发送请求到MegaLLM API: model={model}, messages_count={len(messages)}, stream={is_stream}")
 
         try:
             response = await self._client.post(url, json=payload, headers=headers)
             response.raise_for_status()
 
+            # 流式响应直接返回 response 对象
+            if is_stream:
+                logger.info(f"流式请求成功: model={model}")
+                return response
+
+            # 非流式响应解析 JSON
             result = response.json()
             logger.info(f"请求成功: model={model}, usage={result.get('usage', {})}")
             return result

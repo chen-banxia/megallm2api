@@ -125,11 +125,18 @@ curl -X POST http://localhost:8000/v1/chat/completions \
 
 可以在请求中使用以下模型:
 
-- gpt-4
-- gpt-4-turbo
+- openai-gpt-oss-20b
+- llama3.3-70b-instruct
+- deepseek-r1-distill-llama-70b
+- alibaba-qwen3-32b
 - openai-gpt-oss-120b
-- claude-3-opus
-- claude-3-sonnet
+- llama3-8b-instruct
+- moonshotai/kimi-k2-instruct-0905
+- deepseek-ai/deepseek-v3.1-terminus
+- qwen/qwen3-next-80b-a3b-instruct
+- deepseek-ai/deepseek-v3.1
+- mistralai/mistral-nemotron
+- minimaxai/minimax-m2
 - 以及 MegaLLM 支持的其他模型
 
 ## 管理功能
