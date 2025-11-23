@@ -1,0 +1,7 @@
+# 在此文件中添加您的MegaLLM API密钥，每行一个
+# 示例：
+# sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# sk-yyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+# sk-zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+
+# 请将此文件重命名为 keys.txt 并填入真实的API密钥
