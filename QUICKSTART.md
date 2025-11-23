@@ -2,7 +2,11 @@
 
 ## 5分钟快速开始
 
+**环境要求:** Python 3.8+ (推荐 3.11+，开发测试版本 3.12)
+
 ### 步骤 1: 安装依赖
+
+**方式一：使用安装脚本（推荐）**
 
 **Windows:**
 ```bash
@@ -14,6 +18,25 @@ scripts\setup.bat
 ```bash
 chmod +x scripts/setup.sh
 ./scripts/setup.sh
+```
+
+**方式二：手动安装**
+
+```bash
+# 创建虚拟环境
+python -m venv .venv
+
+# 激活虚拟环境
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+
+# 安装生产依赖
+pip install -r requirements.txt
+
+# (可选) 如果需要开发工具
+pip install -r requirements-dev.txt
 ```
 
 ### 步骤 2: 配置 API 密钥

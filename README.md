@@ -34,7 +34,10 @@ megallm2api/
 
 ### 1. 环境准备
 
-需要 Python 3.8+
+**Python 版本要求:**
+- 最小版本: Python 3.8+
+- 推荐版本: Python 3.11+
+- 开发测试版本: Python 3.12
 
 ```bash
 # 克隆项目
@@ -50,8 +53,11 @@ python -m venv .venv
 # Linux/Mac:
 source .venv/bin/activate
 
-# 安装依赖
+# 安装生产依赖
 pip install -r requirements.txt
+
+# 如果是开发环境，还需要安装开发工具
+pip install -r requirements-dev.txt
 ```
 
 ### 2. 配置
@@ -254,14 +260,23 @@ curl http://localhost:8000/v1/models
 ## 测试
 
 ```bash
+# 确保已安装开发依赖
+pip install -r requirements-dev.txt
+
 # 运行单元测试
 pytest
 
 # 查看测试覆盖率
-pytest --cov=core --cov=api
+pytest --cov=core --cov=api --cov-report=html
 
 # 运行特定测试
 pytest tests/test_key_manager.py -v
+
+# 测试 API 功能
+python scripts/test_api.py
+
+# 测试流式响应
+python scripts/test_stream.py
 ```
 
 ## 部署建议
@@ -271,7 +286,7 @@ pytest tests/test_key_manager.py -v
 创建 `Dockerfile`:
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 

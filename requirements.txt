@@ -1,15 +1,43 @@
-# Web框架
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# ============================================
+# MegaLLM API 代理服务 - 生产环境依赖
+# ============================================
+#
+# 安装方法：
+#   pip install -r requirements.txt
+#
+# 开发环境还需要安装：
+#   pip install -r requirements-dev.txt
+#
 
-# HTTP客户端
-httpx==0.26.0
-tenacity==8.2.3
+# Web 框架
+fastapi==0.109.0              # 现代化的 Web 框架
+uvicorn[standard]==0.27.0     # ASGI 服务器，支持 HTTP/2
+
+# 数据验证
+pydantic==2.5.3               # 数据验证和设置管理
+pydantic-settings==2.1.0      # 环境变量和配置管理
+
+# HTTP 客户端
+httpx==0.26.0                 # 异步 HTTP 客户端，支持 HTTP/2
+tenacity==8.2.3               # 智能重试机制
 
 # 日志
-loguru==0.7.2
+loguru==0.7.2                 # 简单强大的日志库
 
-# CORS
-python-multipart==0.0.6
+# CORS 和中间件
+python-multipart==0.0.6       # 处理表单数据和文件上传
+
+# ============================================
+# 说明
+# ============================================
+#
+# 版本说明：
+# - FastAPI 0.109.0: 稳定版本，支持 Python 3.8+
+# - httpx 0.26.0: 支持 HTTP/2 和连接池
+# - tenacity 8.2.3: 提供指数退避重试
+#
+# Python 版本要求:
+# - 最小版本: 3.8+
+# - 推荐版本: 3.11+
+# - 开发版本: 3.12 (已测试)
+#

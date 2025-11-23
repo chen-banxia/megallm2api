@@ -1,0 +1,32 @@
+# ============================================
+# 开发环境额外依赖
+# ============================================
+#
+# 使用方法：
+#   pip install -r requirements.txt          # 安装生产依赖
+#   pip install -r requirements-dev.txt      # 再安装开发依赖
+#
+# 或一次性安装：
+#   pip install -r requirements.txt -r requirements-dev.txt
+#
+
+# 测试工具
+pytest==8.0.0                 # 测试框架
+pytest-asyncio==0.23.4        # 异步测试支持
+pytest-cov==4.1.0             # 测试覆盖率报告
+pytest-mock==3.12.0           # Mock 支持
+
+# 代码质量工具
+black==24.1.1                 # 代码格式化（PEP 8）
+flake8==7.0.0                 # 代码风格检查
+isort==5.13.2                 # import 语句排序
+mypy==1.8.0                   # 静态类型检查
+
+# API 测试客户端
+requests==2.31.0              # 用于测试脚本
+openai==1.12.0                # OpenAI SDK（用于文档示例和兼容性测试）
+
+# 开发辅助工具
+ipython==8.21.0               # 增强的 Python shell
+ipdb==0.13.13                 # IPython debugger
+python-dotenv==1.0.1          # 本地 .env 文件支持（开发环境）
